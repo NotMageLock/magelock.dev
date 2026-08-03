@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Othello</title>
+<style>
+  :root {
+    --bg: #1b1f24;
+    --panel: #242a31;
+    --board: #0e7a3f;
+    --board-line: #0a5c2f;
+    --disc1: #1a1a1a;
+    --disc2: #f5f5f5;
+    --accent: #4da3ff;
+    --text: #e8ecf1;
+    --muted: #9aa5b1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 12px 60px;
+    min-height: 100vh;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .subtitle {
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  .layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .panel {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 18px 20px;
+    min-width: 240px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+  .panel h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+  .row label { font-size: 14px; }
+  select, input[type=color], input[type=range] {
+    background: #1a1f25;
+    color: var(--text);
+    border: 1px solid #34404c;
+    border-radius: 6px;
+    padding: 4px 6px;
+  }
+  input[type=color] {
+    width: 46px;
+    height: 30px;
+    padding: 2px;
+    cursor: pointer;
+  }
+  button {
+    background: var(--accent);
+    color: #0a1420;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 6px;
+    transition: filter .15s ease;
+  }
+  button:hover { filter: brightness(1.1); }
+  button.secondary {
+    background: #34404c;
+    color: var(--text);
+  }
+  #status {
+    font-size: 15px;
+    margin-bottom: 10px;
+    min-height: 20px;
+  }
+  #scoreboard {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  .score-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1f25;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+  .swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  #board {
+    display: grid;
+    background: var(--board-line);
+    border: 4px solid var(--board-line);
+    border-radius: 6px;
+    gap: 2px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  }
+  .cell {
+    background: var(--board);
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .cell.hint::after {
+    content: '';
+    width: 22%;
+    height: 22%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+  }
+  .disc {
+    width: 84%;
+    height: 84%;
+    border-radius: 50%;
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.35), 0 2px 4px rgba(0,0,0,0.4);
+    transform: scale(0);
+    animation: pop .22s ease forwards;
+  }
+  @keyframes pop {
+    to { transform: scale(1); }
+  }
+  .disc.black { background: var(--disc1); }
+  .disc.white { background: var(--disc2); }
+  #board-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  footer {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    max-width: 500px;
+  }
+  .diff-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: -6px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Othello</h1>
+<div class="subtitle">Classic strategy game vs. a minimax AI</div>
+
+<div class="layout">
+  <div class="panel">
+    <h2>Game Setup</h2>
+    <div class="row">
+      <label for="sizeSelect">Board size</label>
+      <select id="sizeSelect">
+        <option value="6">6 × 6</option>
+        <option value="8" selected>8 × 8</option>
+        <option value="10">10 × 10</option>
+        <option value="12">12 × 12</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="diffSelect">AI difficulty</label>
+      <select id="diffSelect">
+        <option value="1">Easy</option>
+        <option value="2" selected>Normal</option>
+        <option value="3">Hard</option>
+        <option value="4">Expert</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="playerColorSelect">You play as</label>
+      <select id="playerColorSelect">
+        <option value="black" selected>Black (goes first)</option>
+        <option value="white">White</option>
+      </select>
+    </div>
+
+    <h2 style="margin-top:18px;">Colors</h2>
+    <div class="row">
+      <label for="boardColor">Board</label>
+      <input type="color" id="boardColor" value="#0e7a3f">
+    </div>
+    <div class="row">
+      <label for="blackColor">Black discs</label>
+      <input type="color" id="blackColor" value="#1a1a1a">
+    </div>
+    <div class="row">
+      <label for="whiteColor">White discs</label>
+      <input type="color" id="whiteColor" value="#f5f5f5">
+    </div>
+
+    <button id="newGameBtn">New Game</button>
+    <button id="undoBtn" class="secondary">Undo Move</button>
+  </div>
+
+  <div id="board-wrap">
+    <div id="scoreboard">
+      <div class="score-chip"><span class="swatch" id="chipBlack"></span><span id="scoreBlack">2</span></div>
+      <div class="score-chip"><span class="swatch" id="chipWhite"></span><span id="scoreWhite">2</span></div>
+    </div>
+    <div id="status">Your move</div>
+    <div id="board"></div>
+  </div>
+</div>
+
+<footer>Tap a highlighted square to place a disc. The AI thinks ahead using minimax search with alpha-beta pruning, weighing corners, edges, mobility, and stability.</footer>
+
+<script>
+(function(){
+  const EMPTY = 0, BLACK = 1, WHITE = 2;
+  let SIZE = 8;
+  let board = [];
+  let current = BLACK;
+  let playerColor = BLACK;
+  let aiColor = WHITE;
+  let difficulty = 2;
+  let history = [];
+  let gameOver = false;
+  let aiThinking = false;
+
+  const boardEl = document.getElementById('board');
+  const statusEl = document.getElementById('status');
+  const scoreBlackEl = document.getElementById('scoreBlack');
+  const scoreWhiteEl = document.getElementById('scoreWhite');
+  const chipBlack = document.getElementById('chipBlack');
+  const chipWhite = document.getElementById('chipWhite');
+
+  const sizeSelect = document.getElementById('sizeSelect');
+  const diffSelect = document.getElementById('diffSelect');
+  const playerColorSelect = document.getElementById('playerColorSelect');
+  const boardColorInput = document.getElementById('boardColor');
+  const blackColorInput = document.getElementById('blackColor');
+  const whiteColorInput = document.getElementById('whiteColor');
+
+  const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+  function makeBoard(size){
+    const b = [];
+    for(let r=0;r<size;r++){
+      b.push(new Array(size).fill(EMPTY));
+    }
+    const mid = size/2;
+    b[mid-1][mid-1] = WHITE;
+    b[mid][mid] = WHITE;
+    b[mid-1][mid] = BLACK;
+    b[mid][mid-1] = BLACK;
+    return b;
+  }
+
+  function inBounds(r,c){
+    return r>=0 && r<SIZE && c>=0 && c<SIZE;
+  }
+
+  function opponent(color){
+    return color === BLACK ? WHITE : BLACK;
+  }
+
+  function getFlips(b, r, c, color){
+    if(b[r][c] !== EMPTY) return [];
+    let allFlips = [];
+    const opp = opponent(color);
+    for(const [dr,dc] of DIRS){
+      let rr = r+dr, cc = c+dc;
+      let line = [];
+      while(inBounds(rr,cc) && b[rr][cc] === opp){
+        line.push([rr,cc]);
+        rr += dr; cc += dc;
+      }
+      if(line.length && inBounds(rr,cc) && b[rr][cc] === color){
+        allFlips = allFlips.concat(line);
+      }
+    }
+    return allFlips;
+  }
+
+  function validMoves(b, color){
+    const moves = [];
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        if(b[r][c] === EMPTY){
+          const flips = getFlips(b, r, c, color);
+          if(flips.length) moves.push({r,c,flips});
+        }
+      }
+    }
+    return moves;
+  }
+
+  function applyMove(b, move, color){
+    b[move.r][move.c] = color;
+    for(const [r,c] of move.flips){
+      b[r][c] = color;
+    }
+  }
+
+  function cloneBoard(b){
+    return b.map(row => row.slice());
+  }
+
+  function countDiscs(b){
+    let black=0, white=0;
+    for(let r=0;r<SIZE;r++) for(let c=0;c<SIZE;c++){
+      if(b[r][c]===BLACK) black++;
+      else if(b[r][c]===WHITE) white++;
+    }
+    return {black, white};
+  }
+
+  // ---- Rendering ----
+  function render(){
+    boardEl.style.gridTemplateColumns = `repeat(${SIZE}, 1fr)`;
+    boardEl.style.width = `min(90vw, ${SIZE*58}px)`;
+    boardEl.innerHTML = '';
+    const moves = (!gameOver && current === playerColor) ? validMoves(board, current) : [];
+    const moveMap = new Set(moves.map(m => m.r+'_'+m.c));
+
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        const key = r+'_'+c;
+        if(moveMap.has(key)) cell.classList.add('hint');
+        if(board[r][c] !== EMPTY){
+          const disc = document.createElement('div');
+          disc.className = 'disc ' + (board[r][c]===BLACK ? 'black':'white');
+          cell.appendChild(disc);
+        }
+        cell.addEventListener('click', () => onCellClick(r,c));
+        boardEl.appendChild(cell);
+      }
+    }
+
+    const {black, white} = countDiscs(board);
+    scoreBlackEl.textContent = black;
+    scoreWhiteEl.textContent = white;
+    updateStatus();
+  }
+
+  function updateStatus(){
+    if(gameOver){
+      const {black, white} = countDiscs(board);
+      let msg;
+      if(black === white) msg = "It's a tie!";
+      else {
+        const winner = black > white ? BLACK : WHITE;
+        const winnerName = winner === playerColor ? 'You win!' : (winner === BLACK ? 'Black wins.' : 'White wins.');
+        msg = winnerName;
+      }
+      statusEl.textContent = msg + ` (${black} - ${white})`;
+      return;
+    }
+    if(aiThinking){
+      statusEl.textContent = 'AI is thinking...';
+      return;
+    }
+    if(current === playerColor){
+      statusEl.textContent = 'Your move';
+    } else {
+      statusEl.textContent = "AI's move...";
+    }
+  }
+
+  // ---- Game flow ----
+  function saveHistory(){
+    history.push({board: cloneBoard(board), current});
+    if(history.length > 40) history.shift();
+  }
+
+  function onCellClick(r,c){
+    if(gameOver || aiThinking) return;
+    if(current !== playerColor) return;
+    const flips = getFlips(board, r, c, current);
+    if(!flips.length) return;
+    saveHistory();
+    applyMove(board, {r,c,flips}, current);
+    advanceTurn();
+  }
+
+  function advanceTurn(){
+    current = opponent(current);
+    const moves = validMoves(board, current);
+    if(!moves.length){
+      // pass or game over
+      const otherMoves = validMoves(board, opponent(current));
+      current = opponent(current);
+      if(!otherMoves.length){
+        gameOver = true;
+        render();
+        return;
+      } else {
+        // current player passes, back to other side... actually recompute properly
+      }
+    }
+    render();
+    checkAiTurn();
+  }
+
+  function checkAiTurn(){
+    if(gameOver) return;
+    if(current === aiColor){
+      const moves = validMoves(board, current);
+      if(!moves.length){
+        // AI passes
+        current = opponent(current);
+        const nextMoves = validMoves(board, current);
+        if(!nextMoves.length){ gameOver = true; }
+        render();
+        checkAiTurn();
+        return;
+      }
+      aiThinking = true;
+      updateStatus();
+      setTimeout(() => {
+        const move = chooseAiMove(board, current, difficulty);
+        saveHistory();
+        applyMove(board, move, current);
+        aiThinking = false;
+        advanceTurnAfterAi();
+      }, 260);
+    } else {
+      const moves = validMoves(board, current);
+      if(!moves.length){
+        current = opponent(current);
+        const nextMoves = validMoves(board, current);
+        if(!nextMoves.length){ gameOver = true; }
+        render();
+        checkAiTurn();
+      }
+    }
+  }
+
+  function advanceTurnAfterAi(){
+    current = opponent(current);
+    const moves = validMoves(board, current);
+    if(!moves.length){
+      current = opponent(current);
+      const otherMoves = validMoves(board, current);
+      if(!otherMoves.length){
+        gameOver = true;
+      }
+    }
+    render();
+    checkAiTurn();
+  }
+
+  // ---- AI: minimax with alpha-beta ----
+  function weightMatrix(size){
+    // generate positional weights, corners high, adjacent-to-corner low, edges medium
+    const w = [];
+    for(let r=0;r<size;r++){
+      w.push(new Array(size).fill(10));
+    }
+    for(let r=0;r<size;r++){
+      for(let c=0;c<size;c++){
+        let val = 10;
+        const edgeR = (r===0 || r===size-1);
+        const edgeC = (c===0 || c===size-1);
+        if(edgeR && edgeC) val = 100; // corner
+        else if(edgeR || edgeC) val = 25; // edge
+        // squares adjacent to corners are risky
+        const nearCornerR = (r===1 || r===size-2);
+        const nearCornerC = (c===1 || c===size-2);
+        if((r===0||r===size-1) && nearCornerC) val = -20;
+        if((c===0||c===size-1) && nearCornerR) val = -20;
+        if(nearCornerR && nearCornerC && !edgeR && !edgeC) val = -12;
+        w[r][c] = val;
+      }
+    }
+    return w;
+  }
+
+  let cachedWeights = null;
+  let cachedSize = -1;
+  function getWeights(){
+    if(cachedSize !== SIZE){
+      cachedWeights = weightMatrix(SIZE);
+      cachedSize = SIZE;
+    }
+    return cachedWeights;
+  }
+
+  function evaluateBoard(b, color){
+    const opp = opponent(color);
+    const weights = getWeights();
+    let posScore = 0;
+    let myCount = 0, oppCount = 0;
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        if(b[r][c] === color){ posScore += weights[r][c]; myCount++; }
+        else if(b[r][c] === opp){ posScore -= weights[r][c]; oppCount++; }
+      }
+    }
+    const myMoves = validMoves(b, color).length;
+    const oppMoves = validMoves(b, opp).length;
+    const mobility = (myMoves + oppMoves === 0) ? 0 : 100 * (myMoves - oppMoves) / (myMoves + oppMoves + 1);
+
+    const totalDiscs = myCount + oppCount;
+    const discDiff = 100 * (myCount - oppCount) / (myCount + oppCount + 1);
+
+    // corners captured
+    let cornerScore = 0;
+    const corners = [[0,0],[0,SIZE-1],[SIZE-1,0],[SIZE-1,SIZE-1]];
+    for(const [r,c] of corners){
+      if(b[r][c] === color) cornerScore += 25;
+      else if(b[r][c] === opp) cornerScore -= 25;
+    }
+
+    // weight phases: early game favor position/mobility, late game favor disc count
+    const progress = totalDiscs / (SIZE*SIZE);
+    const posWeight = 1.0 - progress*0.5;
+    const discWeight = progress * 1.5;
+
+    return posScore*posWeight + mobility*1.2 + cornerScore*2 + discDiff*discWeight;
+  }
+
+  function minimax(b, color, aiColorRoot, depth, alpha, beta, maximizing){
+    const moves = validMoves(b, color);
+    if(depth === 0 || movesExhausted(b)){
+      return evaluateBoard(b, aiColorRoot);
+    }
+    if(!moves.length){
+      // pass
+      const oppMoves = validMoves(b, opponent(color));
+      if(!oppMoves.length){
+        return evaluateBoard(b, aiColorRoot);
+      }
+      return minimax(b, opponent(color), aiColorRoot, depth-1, alpha, beta, !maximizing);
+    }
+
+    if(maximizing){
+      let value = -Infinity;
+      for(const m of moves){
+        const nb = cloneBoard(b);
+        applyMove(nb, m, color);
+        const val = minimax(nb, opponent(color), aiColorRoot, depth-1, alpha, beta, false);
+        value = Math.max(value, val);
+        alpha = Math.max(alpha, value);
+        if(alpha >= beta) break;
+      }
+      return value;
+    } else {
+      let value = Infinity;
+      for(const m of moves){
+        const nb = cloneBoard(b);
+        applyMove(nb, m, color);
+        const val = minimax(nb, opponent(color), aiColorRoot, depth-1, alpha, beta, true);
+        value = Math.min(value, val);
+        beta = Math.min(beta, value);
+        if(alpha >= beta) break;
+      }
+      return value;
+    }
+  }
+
+  function movesExhausted(b){
+    return validMoves(b, BLACK).length === 0 && validMoves(b, WHITE).length === 0;
+  }
+
+  function chooseAiMove(b, color, diff){
+    const moves = validMoves(b, color);
+    if(moves.length === 1) return moves[0];
+
+    let depth;
+    switch(diff){
+      case 1: depth = 1; break;
+      case 2: depth = 2; break;
+      case 3: depth = 3; break;
+      case 4: depth = 4; break;
+      default: depth = 2;
+    }
+    // scale depth down a bit for larger boards to keep responsive
+    if(SIZE >= 10) depth = Math.max(1, depth-1);
+    if(SIZE >= 12) depth = Math.max(1, depth-1);
+
+    // Easy mode: add randomness
+    if(diff === 1){
+      if(Math.random() < 0.35){
+        return moves[Math.floor(Math.random()*moves.length)];
+      }
+    }
+
+    let bestVal = -Infinity;
+    let bestMoves = [];
+    let alpha = -Infinity, beta = Infinity;
+    for(const m of moves){
+      const nb = cloneBoard(b);
+      applyMove(nb, m, color);
+      const val = minimax(nb, opponent(color), color, depth-1, alpha, beta, false);
+      if(val > bestVal){
+        bestVal = val;
+        bestMoves = [m];
+      } else if(val === bestVal){
+        bestMoves.push(m);
+      }
+      alpha = Math.max(alpha, val);
+    }
+    return bestMoves[Math.floor(Math.random()*bestMoves.length)];
+  }
+
+  // ---- Controls ----
+  function applyColors(){
+    document.documentElement.style.setProperty('--board', boardColorInput.value);
+    document.documentElement.style.setProperty('--disc1', blackColorInput.value);
+    document.documentElement.style.setProperty('--disc2', whiteColorInput.value);
+    // derive a slightly darker line color from board color
+    document.documentElement.style.setProperty('--board-line', shade(boardColorInput.value, -25));
+    chipBlack.style.background = blackColorInput.value;
+    chipWhite.style.background = whiteColorInput.value;
+  }
+
+  function shade(hex, percent){
+    const num = parseInt(hex.slice(1),16);
+    let r = (num>>16) + Math.round(255*percent/100);
+    let g = ((num>>8)&0xff) + Math.round(255*percent/100);
+    let b = (num&0xff) + Math.round(255*percent/100);
+    r = Math.max(0,Math.min(255,r));
+    g = Math.max(0,Math.min(255,g));
+    b = Math.max(0,Math.min(255,b));
+    return '#' + (r.toString(16).padStart(2,'0')) + (g.toString(16).padStart(2,'0')) + (b.toString(16).padStart(2,'0'));
+  }
+
+  function newGame(){
+    SIZE = parseInt(sizeSelect.value, 10);
+    difficulty = parseInt(diffSelect.value, 10);
+    playerColor = playerColorSelect.value === 'black' ? BLACK : WHITE;
+    aiColor = opponent(playerColor);
+    board = makeBoard(SIZE);
+    current = BLACK;
+    gameOver = false;
+    aiThinking = false;
+    history = [];
+    applyColors();
+    render();
+    checkAiTurn();
+  }
+
+  function undoMove(){
+    if(aiThinking) return;
+    // undo until it's player's turn again (pop AI move and player move if present)
+    if(history.length === 0) return;
+    let steps = 0;
+    // if last saved state's "current" equals player's turn means we need to pop twice typically
+    let state = history.pop();
+    board = state.board;
+    current = state.current;
+    gameOver = false;
+    if(history.length > 0 && current !== playerColor){
+      state = history.pop();
+      board = state.board;
+      current = state.current;
+    }
+    render();
+  }
+
+  boardColorInput.addEventListener('input', applyColors);
+  blackColorInput.addEventListener('input', applyColors);
+  whiteColorInput.addEventListener('input', applyColors);
+  document.getElementById('newGameBtn').addEventListener('click', newGame);
+  document.getElementById('undoBtn').addEventListener('click', undoMove);
+
+  newGame();
+})();
+</script>
+</body>
+</html>
