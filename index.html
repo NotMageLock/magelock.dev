@@ -1,86 +1,248 @@
 <!DOCTYPE html>
-  <head>
-    <meta charset="utf-8">
-    <title>magelock.dev</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Tiny5&display=swap" rel="stylesheet">
-    <style>
-      body {
-        background-color:rgb(15, 15, 15);
-        color:orange;
-        font-family: "Lilita One", sans-serif;
-        font-weight: 400;
-        margin-left: 40%;
-        margin-right: 40%;
-        font-size: 23px;
-      }
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>magelock.dev</title>
+<style>
+  :root{
+    --bg:#000000;
+    --orange:#ff8c1a;
+    --orange-dim:#8a4d0e;
+    --white:#f0ede6;
+    --purple:#6221ca;
+    --purple-dim:#3a1470;
+  }
 
-      a {
-        color:#6221ca;
-      }
+  * { box-sizing: border-box; }
 
-      table {
-        margin-left: auto;
-        margin-right: auto;
-        width: 30%;
-      }
+  html, body {
+    background: var(--bg);
+    color: var(--white);
+    margin: 0;
+    padding: 0;
+  }
 
-      td {
-        text-align: center;
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-      
-      .title {
-        text-align: center;
-        font-family: "Tiny5", sans-serif;
-        font-weight: 400;
-        font-style: normal;
-        font-size: 48px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-          120deg,
-          orange 0%,
-          orange 40%,
-          #4400ff 50%,
-          orange 60%,
-          orange 100%
-        );
+  body {
+    font-family: "IBM Plex Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", monospace;
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 78ch;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
 
-        background-size: 200% 100%;
+  a {
+    color: var(--orange);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  a:visited { color: var(--orange-dim); }
+  a:hover, a:focus { color: var(--white); background: var(--purple-dim); }
+  a:focus { outline: 2px solid var(--purple); outline-offset: 2px; }
 
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+  pre {
+    color: var(--orange);
+    margin: 0 0 1.5rem 0;
+    font-size: 0.78rem;
+    line-height: 1.15;
+    overflow-x: auto;
+  }
 
-        animation: sheen 20s linear infinite;
-      }
-      @keyframes sheen {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <h1 class="title">toki, mi jan Lok</h1>
-    <h2 style="text-align:center; font-size:25px">I make games and stuff</h2>
-    <table>
-      <tr>
-        <td><a href="https://magelock.newgrounds.com/" target="_blank" rel="noopener noreferrer">Newgrounds</a></td>
-        <td><a href="https://steamcommunity.com/id/NotMageLock/" target="_blank" rel="noopener noreferrer">Steam</a></td>
-        <td><a href="https://github.com/NotMageLock/" target="_blank" rel="noopener noreferrer">GitHub</a></td>
-        <td><a href="https://notmagelock.itch.io/" target="_blank" rel="noopener noreferrer">itch.io</a></td>
-      </tr>
-    </table>
-    <h3>MCSDL</h3>
-    <p>A python library for doing various things with minecraft server jars</p>
-    <a href="https://github.com/NotMageLock/mcsdl" target="_blank" rel="noopener noreferrer" style="font-size: 18px;">GitHub</a>
-    <h3>More to come</h3>
-    <p>wowza</p>
-  </body>
+  .tagline {
+    color: var(--white);
+    margin: 0 0 1.75rem 0;
+  }
+  .tagline .prompt { color: var(--purple); }
+  .tagline .blink { color: var(--orange); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cursor { animation: blink 1.1s steps(1) infinite; }
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  nav {
+    border-top: 1px solid var(--orange-dim);
+    border-bottom: 1px solid var(--orange-dim);
+    padding: 0.6rem 0;
+    margin-bottom: 2rem;
+  }
+  nav ul {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+  nav a { text-decoration: none; }
+  nav a::before { content: "["; color: var(--purple); }
+  nav a::after { content: "]"; color: var(--purple); }
+
+  h1, h2 {
+    color: var(--white);
+    font-weight: normal;
+    letter-spacing: 0.02em;
+  }
+  h2 {
+    margin: 2.25rem 0 0.75rem;
+    color: var(--orange);
+    border-bottom: 1px dashed var(--orange-dim);
+    padding-bottom: 0.3rem;
+  }
+  h2 .eyebrow { color: var(--purple); }
+
+  .field { display: grid; grid-template-columns: 9ch 1fr; gap: 0.15rem 1rem; margin-bottom: 1.5rem; }
+  .field dt { color: var(--purple); }
+  .field dd { margin: 0; }
+
+  ul.links { list-style: none; padding: 0; margin: 0; }
+  ul.links li { margin-bottom: 0.9rem; }
+  ul.links .label { display: inline-block; min-width: 11ch; color: var(--purple); }
+  ul.links .note { color: var(--orange-dim); }
+
+  table.repos {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  table.repos caption { text-align: left; color: var(--orange-dim); font-size: 0.85rem; margin-bottom: 0.4rem; }
+  table.repos th, table.repos td {
+    text-align: left;
+    padding: 0.4rem 0.8rem 0.4rem 0;
+    border-bottom: 1px solid #1a1a1a;
+    vertical-align: top;
+  }
+  table.repos th { color: var(--purple); font-weight: normal; }
+
+  .now-status {
+    border: 1px solid var(--purple-dim);
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .now-status .flag { color: var(--purple); }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--orange-dim);
+    color: var(--orange-dim);
+    font-size: 0.85rem;
+  }
+  footer p { margin: 0.3rem 0; }
+  footer a { color: var(--orange-dim); }
+  footer a:hover { color: var(--white); }
+
+  ::selection { background: var(--purple); color: var(--white); }
+</style>
+</head>
+<body>
+
+<pre aria-hidden="true">
+ __  __                  _               _
+|  \/  | __ _  __ _  ___| |    ___   ___| | __
+| |\/| |/ _` |/ _` |/ _ \ |   / _ \ / __| |/ /
+| |  | | (_| | (_| |  __/ |__| (_) | (__|   &lt;
+|_|  |_|\__,_|\__, |\___|_____\___/ \___|_|\_\
+              |___/
+</pre>
+
+<p class="tagline"><span class="prompt">lokc@thesite:~$</span> whoami<br>
+MageLock &mdash; i make stuff sometimes<span class="cursor blink">_</span></p>
+
+<nav aria-label="section links">
+<ul>
+<li><a href="#about">about</a></li>
+<li><a href="#links">links</a></li>
+<li><a href="#projects">projects</a></li>
+<li><a href="#now">now</a></li>
+<li><a href="#contact">contact</a></li>
+</ul>
+</nav>
+
+<h2 id="about"><span class="eyebrow">$</span> about</h2>
+<dl class="field">
+  <dt>location</dt><dd>Hellas Planitia, Southern Highlands, Mars</dd>
+  <dt>uptime</dt><dd id="uptime">since last commit: loading&hellip;<noscript>unknown</noscript></dd>
+  <dt>doin</dt><dd>making games and tools and stuff like that</dd>
+</dl>
+
+<h2 id="links"><span class="eyebrow">$</span> links</h2>
+<ul class="links">
+  <li><span class="label">newgrounds</span> <a href="https://magelock.newgrounds.com/" rel="me">magelock.newgrounds.com</a></li>
+  <li><span class="label">steam</span> <a href="https://steamcommunity.com/id/NotMageLock/" rel="me">steamcommunity.com/id/NotMageLock</a></li>
+  <li><span class="label">github</span> <a href="https://github.com/NotMageLock/" rel="me">github.com/NotMageLock</a></li>
+</ul>
+
+<h2 id="projects"><span class="eyebrow">$</span> stuff</h2>
+<table class="repos">
+<thead>
+<tr><th scope="col">repo</th><th scope="col">description</th><th scope="col">stack</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/NotMageLock/Dungeons-Downloader">Dungeons-Downloader</a></td>
+  <td>installer for minecraft dungeons on steam deck</td>
+  <td>Python</td>
+</tr>
+<tr>
+  <td><a href="https://github.com/NotMageLock/mcsdl">mcsdl</a></td>
+  <td>library for fetching and downloading minecraft server jars</td>
+  <td>Python</td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://github.com/NotMageLock?tab=repositories">&raquo; full repo list on GitHub</a></p>
+
+<h2 id="now"><span class="eyebrow">$</span> the puter</h2>
+<div class="now-status">
+<p><span class="flag">[CPU]</span> AMD Ryzen 7 9800X3D</p>
+<p><span class="flag">[GPU]</span> NVIDIA GeForce RTX 5070 Ti</p>
+<p><span class="flag">[RAM]</span> 32 GB DDR5-6000 CL36</p>
+<p><span class="flag">[SSD]</span> 2 TB NVMe Gen 4</p>
+</div>
+
+<script>
+  const SITE_REPO = "NotMageLock/magelock.dev";
+
+  function formatSince(dateStr) {
+    const then = new Date(dateStr).getTime();
+    let diff = Math.max(0, Date.now() - then);
+    const units = [
+      ["y", 1000 * 60 * 60 * 24 * 365],
+      ["d", 1000 * 60 * 60 * 24],
+      ["h", 1000 * 60 * 60],
+      ["m", 1000 * 60],
+      ["s", 1000],
+    ];
+    const parts = [];
+    for (const [label, ms] of units) {
+      const val = Math.floor(diff / ms);
+      diff -= val * ms;
+      if (val > 0 || parts.length) parts.push(val + label);
+      if (parts.length === 2) break;
+    }
+    return parts.length ? parts.join(" ") : "0s";
+  }
+
+  async function updateUptime() {
+    const el = document.getElementById("uptime");
+    if (!el) return;
+    try {
+      const res = await fetch(`https://api.github.com/repos/${SITE_REPO}/commits?per_page=1`);
+      if (!res.ok) throw new Error("bad response");
+      const data = await res.json();
+      const date = data[0]?.commit?.committer?.date;
+      if (!date) throw new Error("no date");
+      el.textContent = `since last commit: ${formatSince(date)}`;
+      el.dataset.since = date;
+      setInterval(() => {
+        if (el.dataset.since) el.textContent = `since last commit: ${formatSince(el.dataset.since)}`;
+      }, 1000);
+    } catch (e) {
+      el.textContent = "since last commit: (couldnt reach github)";
+    }
+  }
+  updateUptime();
+</script>
+</body>
 </html>
