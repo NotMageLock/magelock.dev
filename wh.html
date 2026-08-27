@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>webhookthing</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #2b2b2b;
+    color: #e8e8e8;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 13px;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    color: #ff8c1a;
+    font-size: 20px;
+    margin: 0 0 4px 0;
+    border-bottom: 3px solid #ff8c1a;
+    padding-bottom: 8px;
+  }
+  .sub {
+    color: #999;
+    font-size: 11px;
+    margin-bottom: 18px;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .box {
+    background: #383838;
+    border: 1px solid #4a4a4a;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .box h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ff8c1a;
+    margin: 0 0 10px 0;
+  }
+  label {
+    display: block;
+    color: #bbb;
+    margin-bottom: 3px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  label:first-child { margin-top: 0; }
+  input[type=text], input[type=url], textarea {
+    width: 100%;
+    background: #232323;
+    border: 1px solid #555;
+    color: #eee;
+    padding: 6px 8px;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  input[type=text]:focus, input[type=url]:focus, textarea:focus {
+    outline: none;
+    border-color: #ff8c1a;
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  .row {
+    display: flex;
+    gap: 10px;
+  }
+  .row > div { flex: 1; }
+  button {
+    background: #ff8c1a;
+    color: #232323;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 3px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 10px;
+    margin-right: 6px;
+  }
+  button:hover { background: #ffa646; }
+  button.secondary {
+    background: #555;
+    color: #eee;
+  }
+  button.secondary:hover { background: #666; }
+  button.danger {
+    background: #802020;
+    color: #eee;
+    padding: 3px 8px;
+    font-size: 11px;
+    margin-top: 0;
+  }
+  button.danger:hover { background: #a02828; }
+  button.small {
+    padding: 3px 8px;
+    font-size: 11px;
+    margin-top: 0;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #2f2f2f;
+    border: 1px solid #444;
+    border-radius: 3px;
+    padding: 6px 10px;
+    margin-top: 6px;
+  }
+  .list-item.selected {
+    border-color: #ff8c1a;
+  }
+  .list-item .info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1;
+  }
+  .list-item img.pfp {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #555;
+    object-fit: cover;
+  }
+  .list-item .name {
+    font-size: 12px;
+    color: #ddd;
+  }
+  .list-item .url-snip {
+    font-size: 11px;
+    color: #888;
+  }
+  .btns { display: flex; gap: 4px; }
+  hr.thin {
+    border: none;
+    border-top: 1px solid #4a4a4a;
+    margin: 10px 0;
+  }
+  #status {
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 3px;
+    display: none;
+  }
+  #status.ok { background: #204020; color: #a0e0a0; display: block; }
+  #status.err { background: #402020; color: #e0a0a0; display: block; }
+  .previewbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    background: #2f2f2f;
+    padding: 8px;
+    border-radius: 3px;
+  }
+  .previewbar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #555;
+  }
+  .previewbar span {
+    color: #ff8c1a;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .small-note {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .empty-note {
+    color: #777;
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>webhookthing</h1>
+  <div class="sub">wowza</div>
+
+  <div class="box">
+    <h2>webhooks</h2>
+    <label for="whUrl">webhook url</label>
+    <input type="url" id="whUrl" placeholder="https://discord.com/api/webhooks/...">
+    <div class="row">
+      <div>
+        <label for="whLabel">save as (optional label)</label>
+        <input type="text" id="whLabel" placeholder="e.g. egg general">
+      </div>
+    </div>
+    <button onclick="saveWebhook()">save webhook</button>
+
+    <hr class="thin">
+    <div id="webhookList"></div>
+    <div id="webhookEmpty" class="empty-note">no saved webhooks yet</div>
+  </div>
+
+  <div class="box">
+    <h2>saved personas</h2>
+    <div class="small-note">make a thing</div>
+
+    <label for="personaName">display name</label>
+    <input type="text" id="personaName" placeholder="e.g. john egg">
+
+    <label for="personaImgUrl">avatar image url</label>
+    <input type="text" id="personaImgUrl" placeholder="paste a url or upload a picture fr">
+    <div class="row">
+      <div>
+        <label for="personaImgFile">or upload a picture</label>
+        <input type="file" id="personaImgFile" accept="image/*" onchange="handleFileUpload(event)">
+      </div>
+    </div>
+
+    <div class="previewbar" id="personaPreview" style="display:none;">
+      <img id="personaPreviewImg" src="">
+      <span id="personaPreviewName"></span>
+    </div>
+
+    <button onclick="savePersona()">save persona</button>
+
+    <hr class="thin">
+    <div id="personaList"></div>
+    <div id="personaEmpty" class="empty-note">you aint got nun</div>
+  </div>
+
+  <div class="box">
+    <h2>send message</h2>
+    <div class="small-note">sending as: <span id="sendingAs">nobody selected - pick a persona or type a thing</span></div>
+
+    <label for="msgOverrideName">name (leave blank fer persona)</label>
+    <input type="text" id="msgOverrideName" placeholder="optional override">
+    <label for="msgOverrideImg">avatar url (leave blank fer persona)</label>
+    <input type="text" id="msgOverrideImg" placeholder="optional override">
+
+    <label for="msgText">message</label>
+    <textarea id="msgText" placeholder="type yer message..."></textarea>
+
+    <button onclick="sendMessage()">send</button>
+    <button class="secondary" onclick="clearMessage()">clear</button>
+
+    <div id="status"></div>
+  </div>
+
+</div>
+
+<script>
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+function saveJSON(key, val) {
+  localStorage.setItem(key, JSON.stringify(val));
+}
+
+let webhooks = loadJSON('wh_webhooks', []);
+let personas = loadJSON('wh_personas', []);
+let selectedWebhookId = loadJSON('wh_selectedWebhook', null);
+let selectedPersonaId = loadJSON('wh_selectedPersona', null);
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function saveWebhook() {
+  const url = document.getElementById('whUrl').value.trim();
+  const label = document.getElementById('whLabel').value.trim();
+  if (!url) return showStatus('enter a webhook url first brochacho', false);
+  if (!/^https:\/\/discord(app)?\.com\/api\/webhooks\//.test(url)) {
+    if (!confirm("that dont look like a webhook url man. do it anyways?")) return;
+  }
+  const entry = { id: uid(), label: label || 'webhook', url: url };
+  webhooks.push(entry);
+  saveJSON('wh_webhooks', webhooks);
+  document.getElementById('whUrl').value = '';
+  document.getElementById('whLabel').value = '';
+  renderWebhooks();
+  showStatus('webhook saved :D', true);
+}
+
+function deleteWebhook(id) {
+  webhooks = webhooks.filter(w => w.id !== id);
+  saveJSON('wh_webhooks', webhooks);
+  if (selectedWebhookId === id) {
+    selectedWebhookId = null;
+    saveJSON('wh_selectedWebhook', null);
+  }
+  renderWebhooks();
+}
+
+function selectWebhook(id) {
+  selectedWebhookId = id;
+  saveJSON('wh_selectedWebhook', id);
+  renderWebhooks();
+}
+
+function renderWebhooks() {
+  const list = document.getElementById('webhookList');
+  const empty = document.getElementById('webhookEmpty');
+  list.innerHTML = '';
+  if (webhooks.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  webhooks.forEach(w => {
+    const div = document.createElement('div');
+    div.className = 'list-item' + (w.id === selectedWebhookId ? ' selected' : '');
+    const snip = w.url.length > 40 ? w.url.slice(0, 40) + '...' : w.url;
+    div.innerHTML = `
+      <div class="info" onclick="selectWebhook('${w.id}')">
+        <span class="name">${escapeHtml(w.label)}</span>
+        <span class="url-snip">${escapeHtml(snip)}</span>
+      </div>
+      <div class="btns">
+        <button class="small secondary" onclick="selectWebhook('${w.id}')">use</button>
+        <button class="danger" onclick="deleteWebhook('${w.id}')">del</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+let pendingUploadedImgData = null;
+
+function handleFileUpload(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingUploadedImgData = e.target.result;
+    document.getElementById('personaImgUrl').value = '';
+    updatePersonaPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('personaImgUrl').addEventListener('input', function() {
+  pendingUploadedImgData = null;
+  updatePersonaPreview();
+});
+document.getElementById('personaName').addEventListener('input', updatePersonaPreview);
+
+function updatePersonaPreview() {
+  const name = document.getElementById('personaName').value.trim();
+  const url = document.getElementById('personaImgUrl').value.trim();
+  const img = pendingUploadedImgData || url;
+  const bar = document.getElementById('personaPreview');
+  if (!name && !img) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('personaPreviewImg').src = img || '';
+  document.getElementById('personaPreviewName').textContent = name || '(no name yet)';
+}
+
+function savePersona() {
+  const name = document.getElementById('personaName').value.trim();
+  const img = pendingUploadedImgData || document.getElementById('personaImgUrl').value.trim();
+  if (!name) return showStatus('give the persona a name first', false);
+  if (!img) return showStatus('add an avatar image or url first', false);
+  const entry = { id: uid(), name: name, img: img };
+  personas.push(entry);
+  saveJSON('wh_personas', personas);
+  document.getElementById('personaName').value = '';
+  document.getElementById('personaImgUrl').value = '';
+  document.getElementById('personaImgFile').value = '';
+  pendingUploadedImgData = null;
+  document.getElementById('personaPreview').style.display = 'none';
+  renderPersonas();
+  showStatus('persona saved', true);
+}
+
+function deletePersona(id) {
+  personas = personas.filter(p => p.id !== id);
+  saveJSON('wh_personas', personas);
+  if (selectedPersonaId === id) {
+    selectedPersonaId = null;
+    saveJSON('wh_selectedPersona', null);
+  }
+  renderPersonas();
+  updateSendingAsLabel();
+}
+
+function selectPersona(id) {
+  selectedPersonaId = id;
+  saveJSON('wh_selectedPersona', id);
+  renderPersonas();
+  updateSendingAsLabel();
+}
+
+function renderPersonas() {
+  const list = document.getElementById('personaList');
+  const empty = document.getElementById('personaEmpty');
+  list.innerHTML = '';
+  if (personas.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  personas.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'list-item' + (p.id === selectedPersonaId ? ' selected' : '');
+    div.innerHTML = `
+      <div class="info" onclick="selectPersona('${p.id}')">
+        <img class="pfp" src="${escapeAttr(p.img)}">
+        <span class="name">${escapeHtml(p.name)}</span>
+      </div>
+      <div class="btns">
+        <button class="small secondary" onclick="selectPersona('${p.id}')">use</button>
+        <button class="danger" onclick="deletePersona('${p.id}')">del</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function updateSendingAsLabel() {
+  const el = document.getElementById('sendingAs');
+  const p = personas.find(p => p.id === selectedPersonaId);
+  if (p) {
+    el.textContent = p.name;
+  } else {
+    el.textContent = 'nobody selected - pick a persona or type a thing';
+  }
+}
+
+function showStatus(msg, ok) {
+  const s = document.getElementById('status');
+  s.textContent = msg;
+  s.className = ok ? 'ok' : 'err';
+  setTimeout(() => { s.style.display = 'none'; }, 5000);
+}
+
+function clearMessage() {
+  document.getElementById('msgText').value = '';
+  document.getElementById('msgOverrideName').value = '';
+  document.getElementById('msgOverrideImg').value = '';
+}
+
+async function sendMessage() {
+  const wh = webhooks.find(w => w.id === selectedWebhookId);
+  if (!wh) return showStatus('select or save a webhook first', false);
+
+  const text = document.getElementById('msgText').value;
+  if (!text.trim()) return showStatus('type a message first', false);
+
+  const persona = personas.find(p => p.id === selectedPersonaId);
+  const overrideName = document.getElementById('msgOverrideName').value.trim();
+  const overrideImg = document.getElementById('msgOverrideImg').value.trim();
+
+  const username = overrideName || (persona ? persona.name : undefined);
+  const avatar_url = overrideImg || (persona ? persona.img : undefined);
+
+  if (avatar_url && avatar_url.startsWith('data:')) {
+    return showStatus("uploaded images can't be used as the avatar directly when sending, you gotta have a url", false);
+  }
+
+  const payload = { content: text };
+  if (username) payload.username = username;
+  if (avatar_url) payload.avatar_url = avatar_url;
+
+  try {
+    const res = await fetch(wh.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok || res.status === 204) {
+      showStatus('sent', true);
+      document.getElementById('msgText').value = '';
+    } else {
+      const t = await res.text();
+      showStatus('discord said nuhuh: ' + res.status + ' ' + t, false);
+    }
+  } catch (e) {
+    showStatus('failed to send: ' + e.message, false);
+  }
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function escapeAttr(str) {
+  return String(str).replace(/"/g, '&quot;');
+}
+
+renderWebhooks();
+renderPersonas();
+updateSendingAsLabel();
+</script>
+</body>
+</html>
