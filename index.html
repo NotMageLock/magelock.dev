@@ -7,29 +7,29 @@
 <style>
   :root{
     --bg:#000000;
-    --orange:#ff8c1a;
-    --orange-dim:#8a4d0e;
     --white:#f0ede6;
+    --orange:#ff8c1a;
     --purple:#6221ca;
+    --orange-dim:#8a4d0e;
     --purple-dim:#3a1470;
   }
 
   * { box-sizing: border-box; }
 
   html, body {
-    background: var(--bg);
-    color: var(--white);
     margin: 0;
     padding: 0;
+    color: var(--white);
+    background: var(--bg);
   }
 
   body {
-    font-family: "IBM Plex Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", monospace;
-    font-size: 16px;
-    line-height: 1.55;
-    max-width: 78ch;
     margin: 0 auto;
+    font-size: 16px;
+    max-width: 78ch;
+    line-height: 1.55;
     padding: 2rem 1.25rem 4rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", monospace;
   }
 
   a {
@@ -37,74 +37,50 @@
     text-decoration: underline;
     text-underline-offset: 2px;
   }
+
   a:visited { color: var(--orange-dim); }
-  a:hover, a:focus { color: var(--white); background: var(--purple-dim); }
   a:focus { outline: 2px solid var(--purple); outline-offset: 2px; }
+  a:hover, a:focus { color: var(--white); background: var(--purple-dim); }
 
   pre {
+
+    overflow-x: auto;
+    line-height: 1.15;
+    font-size: 0.78rem;
     color: var(--orange);
     margin: 0 0 1.5rem 0;
-    font-size: 0.78rem;
-    line-height: 1.15;
-    overflow-x: auto;
   }
-
-  .tagline {
-    color: var(--white);
-    margin: 0 0 1.75rem 0;
-  }
-  .tagline .prompt { color: var(--purple); }
-  .tagline .blink { color: var(--orange); }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .cursor { animation: blink 1.1s steps(1) infinite; }
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  nav {
-    border-top: 1px solid var(--orange-dim);
-    border-bottom: 1px solid var(--orange-dim);
-    padding: 0.6rem 0;
-    margin-bottom: 2rem;
-  }
-  nav ul {
-    list-style: none;
-    margin: 0; padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.25rem;
-  }
-  nav a { text-decoration: none; }
-  nav a::before { content: "["; color: var(--purple); }
-  nav a::after { content: "]"; color: var(--purple); }
 
   h1, h2 {
     color: var(--white);
     font-weight: normal;
     letter-spacing: 0.02em;
   }
+
   h2 {
-    margin: 2.25rem 0 0.75rem;
     color: var(--orange);
-    border-bottom: 1px dashed var(--orange-dim);
     padding-bottom: 0.3rem;
+    margin: 2.25rem 0 0.75rem;
+    border-bottom: 1px dashed var(--orange-dim);
   }
+
   h2 .eyebrow { color: var(--purple); }
 
-  .field { display: grid; grid-template-columns: 9ch 1fr; gap: 0.15rem 1rem; margin-bottom: 1.5rem; }
-  .field dt { color: var(--purple); }
   .field dd { margin: 0; }
+  .field dt { color: var(--purple); }
+  .field { display: grid; grid-template-columns: 9ch 1fr; gap: 0.15rem 1rem; margin-bottom: 1.5rem; }
 
-  ul.links { list-style: none; padding: 0; margin: 0; }
   ul.links li { margin-bottom: 0.9rem; }
-  ul.links .label { display: inline-block; min-width: 11ch; color: var(--purple); }
   ul.links .note { color: var(--orange-dim); }
+  ul.links { list-style: none; padding: 0; margin: 0; }
+  ul.links .label { display: inline-block; min-width: 11ch; color: var(--purple); }
 
   table.repos {
-    border-collapse: collapse;
     width: 100%;
     margin-bottom: 1rem;
+    border-collapse: collapse;
   }
+
   table.repos caption { text-align: left; color: var(--orange-dim); font-size: 0.85rem; margin-bottom: 0.4rem; }
   table.repos th, table.repos td {
     text-align: left;
@@ -113,31 +89,11 @@
     vertical-align: top;
   }
   table.repos th { color: var(--purple); font-weight: normal; }
-
-  .now-status {
-    border: 1px solid var(--purple-dim);
-    padding: 0.9rem 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .now-status .flag { color: var(--purple); }
-
-  footer {
-    margin-top: 3rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--orange-dim);
-    color: var(--orange-dim);
-    font-size: 0.85rem;
-  }
-  footer p { margin: 0.3rem 0; }
-  footer a { color: var(--orange-dim); }
-  footer a:hover { color: var(--white); }
-
-  ::selection { background: var(--purple); color: var(--white); }
 </style>
 </head>
 <body>
 
-<pre aria-hidden="true">
+<pre aria-hidden="true" style="overflow: hidden;">
  __  __                  _               _
 |  \/  | __ _  __ _  ___| |    ___   ___| | __
 | |\/| |/ _` |/ _` |/ _ \ |   / _ \ / __| |/ /
@@ -148,99 +104,45 @@
 
 <p class="tagline">i make stuff sometimes</p>
 
-<nav aria-label="section links">
-<ul>
-<li><a href="#about">about</a></li>
-<li><a href="#links">links</a></li>
-<li><a href="#projects">projects</a></li>
-<li><a href="#now">the puter</a></li>
-</ul>
-</nav>
-
-<h2 id="about"><span class="eyebrow">$</span> about</h2>
+<h2>stuff i like</h2>
 <dl class="field">
-  <dt>location</dt><dd>Hellas Planitia, Southern Highlands, Mars</dd>
-  <dt>uptime</dt><dd id="uptime">since last commit: loading&hellip;<noscript>unknown</noscript></dd>
-  <dt>doin</dt><dd>making games and tools and stuff like that</dd>
+  <dt>games</dt><dd>I like Titanfall 2, Team Fortress 2, Portal, Half-Life, Luigis Mansion, Plants vs Zombies, EarthBound, stuff like that</dd>
+  <dt>music</dt><dd>I like JID, J. Cole, Smino, Isaiah Rashad, Cordae, and yeah thats pretty much it</dd>
 </dl>
 
-<h2 id="links"><span class="eyebrow">$</span> links</h2>
+<h2>links</h2>
 <ul class="links">
   <li><span class="label">newgrounds</span> <a href="https://magelock.newgrounds.com/" rel="me">magelock.newgrounds.com</a></li>
   <li><span class="label">steam</span> <a href="https://steamcommunity.com/id/NotMageLock/" rel="me">steamcommunity.com/id/NotMageLock</a></li>
   <li><span class="label">github</span> <a href="https://github.com/NotMageLock/" rel="me">github.com/NotMageLock</a></li>
 </ul>
 
-<h2 id="projects"><span class="eyebrow">$</span> stuff</h2>
+<h2>stuff i made</h2>
 <table class="repos">
 <thead>
-<tr><th scope="col">repo</th><th scope="col">description</th><th scope="col">stack</th></tr>
+<tr><th scope="col">thing</th><th scope="col">uh wut</th><th scope="col">stack</th></tr>
 </thead>
 <tbody>
 <tr>
   <td><a href="https://github.com/NotMageLock/Dungeons-Downloader">Dungeons-Downloader</a></td>
-  <td>installer for minecraft dungeons on steam deck</td>
+  <td>installer for minecraft dungeons on steam deck idk I think its broken now</td>
   <td>Python</td>
 </tr>
 <tr>
   <td><a href="https://github.com/NotMageLock/mcsdl">mcsdl</a></td>
-  <td>library for fetching and downloading minecraft server jars</td>
+  <td>library to like download minecraft server jars n stuff</td>
   <td>Python</td>
 </tr>
 </tbody>
 </table>
-<p><a href="https://github.com/NotMageLock?tab=repositories">&raquo; full repo list on GitHub</a></p>
+<p><a href="https://github.com/NotMageLock?tab=repositories">idk just check my github ( i do not have a lot on there )</a></p>
 
-<h2 id="now"><span class="eyebrow">$</span> the puter</h2>
+<h2>my puter</h2>
 <div class="now-status">
 <p><span class="flag">[CPU]</span> AMD Ryzen 7 9800X3D</p>
 <p><span class="flag">[GPU]</span> NVIDIA GeForce RTX 5070 Ti</p>
 <p><span class="flag">[RAM]</span> 32 GB DDR5-6000 CL36</p>
 <p><span class="flag">[SSD]</span> 2 TB NVMe Gen 4</p>
 </div>
-
-<script>
-  const SITE_REPO = "NotMageLock/magelock.dev";
-
-  function formatSince(dateStr) {
-    const then = new Date(dateStr).getTime();
-    let diff = Math.max(0, Date.now() - then);
-    const units = [
-      ["y", 1000 * 60 * 60 * 24 * 365],
-      ["d", 1000 * 60 * 60 * 24],
-      ["h", 1000 * 60 * 60],
-      ["m", 1000 * 60],
-      ["s", 1000],
-    ];
-    const parts = [];
-    for (const [label, ms] of units) {
-      const val = Math.floor(diff / ms);
-      diff -= val * ms;
-      if (val > 0 || parts.length) parts.push(val + label);
-      if (parts.length === 2) break;
-    }
-    return parts.length ? parts.join(" ") : "0s";
-  }
-
-  async function updateUptime() {
-    const el = document.getElementById("uptime");
-    if (!el) return;
-    try {
-      const res = await fetch(`https://api.github.com/repos/${SITE_REPO}/commits?per_page=1`);
-      if (!res.ok) throw new Error("bad response");
-      const data = await res.json();
-      const date = data[0]?.commit?.committer?.date;
-      if (!date) throw new Error("no date");
-      el.textContent = `since last commit: ${formatSince(date)}`;
-      el.dataset.since = date;
-      setInterval(() => {
-        if (el.dataset.since) el.textContent = `since last commit: ${formatSince(el.dataset.since)}`;
-      }, 1000);
-    } catch (e) {
-      el.textContent = "since last commit: (couldnt reach github)";
-    }
-  }
-  updateUptime();
-</script>
 </body>
 </html>
